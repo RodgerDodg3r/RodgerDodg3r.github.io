@@ -1,0 +1,90 @@
+---
+import { getCollection, render } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import StatusBadge from "../../components/StatusBadge.astro";
+import TagList from "../../components/TagList.astro";
+import RetroButton from "../../components/RetroButton.astro";
+import { entrySlug, isPublished } from "../../lib/content";
+import { withBase, formatDate, isoDate } from "../../lib/url";
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects", isPublished);
+  return projects.map((project) => ({
+    params: { slug: entrySlug(project) },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+---
+
+<Layout title={project.data.title} description={project.data.summary} image={project.data.thumbnail}>
+  <Breadcrumbs items={[{ label: "Projects", href: "/projects/" }, { label: project.data.title }]} />
+
+  <h1>{project.data.title}</h1>
+  <p class="meta-line">
+    <time datetime={isoDate(project.data.date)}>{formatDate(project.data.date)}</time>
+    {project.data.updated && <> &middot; updated <time datetime={isoDate(project.data.updated)}>{formatDate(project.data.updated)}</time></>}
+  </p>
+
+  <p>
+    <StatusBadge status={project.data.status} />
+  </p>
+
+  {
+    project.data.thumbnail && (
+      <img src={withBase(project.data.thumbnail)} alt={`${project.data.title} thumbnail`} style="max-width:320px; border:1px solid var(--border); margin-bottom:1em;" />
+    )
+  }
+
+  <table class="meta-table">
+    <tbody>
+      {project.data.technologies.length > 0 && (
+        <tr>
+          <th>Technologies</th>
+          <td>{project.data.technologies.join(", ")}</td>
+        </tr>
+      )}
+      {project.data.tags.length > 0 && (
+        <tr>
+          <th>Tags</th>
+          <td><TagList tags={project.data.tags} class="no-margin" /></td>
+        </tr>
+      )}
+      {(project.data.downloadUrl || project.data.githubUrl || project.data.websiteUrl) && (
+        <tr>
+          <th>Links</th>
+          <td>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              {project.data.downloadUrl && (
+                <RetroButton href={project.data.downloadUrl} variant="accent" external>
+                  Download
+                </RetroButton>
+              )}
+              {project.data.githubUrl && <RetroButton href={project.data.githubUrl} external>Source (GitHub)</RetroButton>}
+              {project.data.websiteUrl && <RetroButton href={project.data.websiteUrl} external>Website</RetroButton>}
+            </div>
+          </td>
+        </tr>
+      )}
+    </tbody>
+  </table>
+
+  {
+    project.data.screenshots.length > 0 && (
+      <div class="screenshot-strip">
+        {project.data.screenshots.map((src) => (
+          <img src={withBase(src)} alt={`${project.data.title} screenshot`} loading="lazy" />
+        ))}
+      </div>
+    )
+  }
+
+  <div class="stack">
+    <Content />
+  </div>
+
+  <p><a href={withBase("/projects/")}>&laquo; back to all projects</a></p>
+</Layout>

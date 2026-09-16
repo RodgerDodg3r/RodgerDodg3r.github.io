@@ -1,0 +1,42 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../../layouts/Layout.astro";
+import GameCard from "../../../components/GameCard.astro";
+import Breadcrumbs from "../../../components/Breadcrumbs.astro";
+import { isPublished, byDateDesc } from "../../../lib/content";
+import { slugifyToken } from "../../../lib/url";
+
+export async function getStaticPaths() {
+  const games = await getCollection("games", isPublished);
+  const statusMap = new Map<string, { label: string; slug: string }>();
+  for (const game of games) {
+    const slug = slugifyToken(game.data.status);
+    if (!statusMap.has(slug)) statusMap.set(slug, { label: game.data.status, slug });
+  }
+  return [...statusMap.values()].map(({ label, slug }) => ({
+    params: { status: slug },
+    props: { statusLabel: label },
+  }));
+}
+
+const { statusLabel } = Astro.props;
+const allGames = await getCollection("games", isPublished);
+const games = allGames.filter((g) => slugifyToken(g.data.status) === Astro.params.status).sort(byDateDesc);
+---
+
+<Layout title={`Games: ${statusLabel}`} description={`Games with status ${statusLabel}.`}>
+  <Breadcrumbs items={[{ label: "Games", href: "/games/" }, { label: `status: ${statusLabel}` }]} />
+  <h1>Games &mdash; {statusLabel}</h1>
+  {
+    games.length > 0 ? (
+      <div class="card-grid">
+        {games.map((game) => (
+          <GameCard game={game} />
+        ))}
+      </div>
+    ) : (
+      <p class="text-muted">Nothing here.</p>
+    )
+  }
+  <p><a href="../../">&laquo; back to all games</a></p>
+</Layout>

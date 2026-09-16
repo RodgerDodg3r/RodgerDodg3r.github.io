@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="88" height="31" viewBox="0 0 88 31">
+  <rect width="88" height="31" fill="#141a21"/>
+  <rect x="0.5" y="0.5" width="87" height="30" fill="none" stroke="#4d5c6b"/>
+  <text x="44" y="13" font-family="Verdana, sans-serif" font-size="8" fill="#6fc3d9" text-anchor="middle" font-weight="bold">HOSTED ON</text>
+  <text x="44" y="24" font-family="Verdana, sans-serif" font-size="8.5" fill="#d7dee5" text-anchor="middle" font-weight="bold">GITHUB PAGES</text>
+</svg>

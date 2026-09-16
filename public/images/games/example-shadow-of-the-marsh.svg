@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" width="320" height="240">
+  <rect width="320" height="240" fill="#0a0f14"/>
+  <rect x="4" y="4" width="312" height="232" fill="none" stroke="#3a4652" stroke-width="2"/>
+  <circle cx="250" cy="60" r="26" fill="#1f2a33" stroke="#4d5c6b"/>
+  <rect x="40" y="150" width="10" height="70" fill="#2b3540"/>
+  <polygon points="20,150 70,150 45,90" fill="#2b3540"/>
+  <rect x="0" y="210" width="320" height="30" fill="#111820"/>
+  <text x="160" y="130" font-family="Verdana, sans-serif" font-size="14" fill="#8b98a5" text-anchor="middle">SHADOW OF THE MARSH</text>
+  <text x="160" y="150" font-family="Courier New, monospace" font-size="10" fill="#4d5c6b" text-anchor="middle">placeholder screenshot</text>
+</svg>

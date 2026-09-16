@@ -1,0 +1,21 @@
+---
+import { siteConfig } from "../config";
+import { withBase } from "../lib/url";
+
+const now = new Date();
+const buildDate = now.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+---
+
+<header class="site-header">
+  <a class="site-header__logo" href={withBase("/")}>
+    <span class="site-header__logo-mark" aria-hidden="true">BC</span>
+    <span>
+      <span class="site-header__title">{siteConfig.name}</span>
+      <span class="site-header__tagline">{siteConfig.tagline}</span>
+    </span>
+  </a>
+  <div class="site-header__status" aria-hidden="true">
+    status: <strong>online</strong><br />
+    last build: {buildDate}
+  </div>
+</header>

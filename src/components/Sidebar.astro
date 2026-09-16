@@ -1,0 +1,99 @@
+---
+import { getCollection } from "astro:content";
+import { siteConfig } from "../config";
+import { withBase, formatDate } from "../lib/url";
+import { entrySlug, isPublished, byDateDesc } from "../lib/content";
+
+const currentPath = Astro.url.pathname.replace(import.meta.env.BASE_URL, "/").replace(/^\/?/, "/");
+
+function isActive(href: string): boolean {
+  if (href === "/") return currentPath === "/" || currentPath === "";
+  return currentPath.startsWith(href);
+}
+
+// "Currently working on" - the newest featured game/project that is not
+// marked Released/Archived/Cancelled. Falls back to nothing if none match,
+// so this section only appears when it has something real to show.
+const [allGames, allProjects] = await Promise.all([
+  getCollection("games", isPublished),
+  getCollection("projects", isPublished),
+]);
+
+const inProgressStatuses = new Set(["in development", "prototype", "planning"]);
+
+const workingOn = [...allGames, ...allProjects]
+  .filter((entry) => entry.data.featured && inProgressStatuses.has(entry.data.status.toLowerCase()))
+  .sort(byDateDesc)[0];
+
+const workingOnHref = workingOn
+  ? withBase(`/${"platforms" in workingOn.data ? "games" : "projects"}/${entrySlug(workingOn)}/`)
+  : undefined;
+
+// "Latest release" - most recently dated game/project marked Released.
+const latestRelease = [...allGames, ...allProjects]
+  .filter((entry) => entry.data.status.toLowerCase() === "released")
+  .sort(byDateDesc)[0];
+
+const latestReleaseHref = latestRelease
+  ? withBase(`/${"platforms" in latestRelease.data ? "games" : "projects"}/${entrySlug(latestRelease)}/`)
+  : undefined;
+---
+
+<nav class="sidebar" aria-label="Main navigation">
+  <div class="sidebar__section">
+    <div class="sidebar__heading">Navigate</div>
+    <div class="sidebar-nav">
+      {
+        siteConfig.nav.map((item) => (
+          <a
+            class="sidebar-nav__link"
+            href={withBase(item.href)}
+            aria-current={isActive(item.href) ? "page" : undefined}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </div>
+  </div>
+
+  {
+    (workingOn || latestRelease) && (
+      <div class="sidebar__section">
+        <div class="sidebar__heading">Status</div>
+        <dl class="sidebar-info">
+          {workingOn && (
+            <>
+              <dt>Currently working on</dt>
+              <dd><a href={workingOnHref}>{workingOn.data.title}</a></dd>
+            </>
+          )}
+          {latestRelease && (
+            <>
+              <dt>Latest release</dt>
+              <dd><a href={latestReleaseHref}>{latestRelease.data.title}</a> &mdash; {formatDate(latestRelease.data.date)}</dd>
+            </>
+          )}
+        </dl>
+      </div>
+    )
+  }
+
+  <div class="sidebar__section">
+    <div class="sidebar__heading">Elsewhere</div>
+    <dl class="sidebar-info">
+      {siteConfig.links.github && (
+        <>
+          <dt>Code</dt>
+          <dd><a href={siteConfig.links.github} target="_blank" rel="noopener noreferrer">GitHub</a></dd>
+        </>
+      )}
+      {siteConfig.links.youtube && (
+        <>
+          <dt>Videos</dt>
+          <dd><a href={siteConfig.links.youtube} target="_blank" rel="noopener noreferrer">YouTube</a></dd>
+        </>
+      )}
+    </dl>
+  </div>
+</nav>

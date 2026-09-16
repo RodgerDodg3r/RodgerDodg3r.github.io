@@ -1,0 +1,57 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import Panel from "../../components/Panel.astro";
+import DownloadItem from "../../components/DownloadItem.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import { withBase, slugifyToken } from "../../lib/url";
+import { isPublished, byDateDesc } from "../../lib/content";
+
+const downloads = (await getCollection("downloads", isPublished)).sort(byDateDesc);
+
+const categories = [...new Set(downloads.map((d) => d.data.category))].sort();
+
+const byCategory = categories.map((category) => ({
+  category,
+  items: downloads.filter((d) => d.data.category === category),
+}));
+---
+
+<Layout title="Downloads" description="Software and file archive.">
+  <Breadcrumbs items={[{ label: "Downloads" }]} />
+  <h1>Downloads</h1>
+  <p class="text-muted">
+    A small archive of software, tools and files. Click into anything for full details -
+    version, file size, checksums and notes - before you download it.
+  </p>
+
+  {
+    categories.length > 1 && (
+      <p class="no-margin" style="margin-bottom:1em;">
+        <span class="text-mono text-muted" style="font-size:0.75rem;">jump to:</span>{" "}
+        {categories.map((category, i) => (
+          <>
+            {i > 0 && " · "}
+            <a href={withBase(`/downloads/category/${slugifyToken(category)}/`)}>{category}</a>
+          </>
+        ))}
+      </p>
+    )
+  }
+
+  {
+    downloads.length === 0 && <p class="text-muted">No downloads yet - add one in src/content/downloads/.</p>
+  }
+
+  {
+    byCategory.map(({ category, items }) => (
+      <Panel title={category}>
+        <div class="row-list" style="border:none; margin-bottom:0;">
+          {items.map((download) => (
+            <DownloadItem download={download} />
+          ))}
+        </div>
+      </Panel>
+    ))
+  }
+</Layout>
