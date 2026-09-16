@@ -1,0 +1,25 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { withBase } from "../lib/url";
+---
+
+<Layout title="404 — File Not Found" noIndex>
+  <div class="callout callout--warning" style="margin-bottom:1.4em;">
+    <div class="callout__title">&#9888; HTTP 404</div>
+    <p class="no-margin">The page you asked for could not be located on this server.</p>
+  </div>
+
+  <h1>404 &mdash; File Not Found</h1>
+  <p>
+    Whatever you were looking for either moved, was renamed, or never existed in the first place. It happens
+    to the best of us.
+  </p>
+  <p class="text-mono text-muted">
+    &gt; ping {typeof Astro !== "undefined" ? Astro.url.pathname : "/unknown"}<br />
+    &gt; 100% packet loss
+  </p>
+  <p>
+    Try heading back to the <a href={withBase("/")}>homepage</a>, or check the
+    <a href={withBase("/links/")}>links page</a> and <a href={withBase("/downloads/")}>downloads archive</a>.
+  </p>
+</Layout>

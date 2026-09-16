@@ -1,0 +1,23 @@
+---
+import { getEntry, render } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import Breadcrumbs from "../components/Breadcrumbs.astro";
+
+const aboutEntry = await getEntry("pages", "about");
+
+if (!aboutEntry) {
+  throw new Error(
+    "Missing src/content/pages/about.md - this page expects an About entry. See README.md for details."
+  );
+}
+
+const { Content } = await render(aboutEntry);
+---
+
+<Layout title={aboutEntry.data.title} description={aboutEntry.data.description}>
+  <Breadcrumbs items={[{ label: "About" }]} />
+  <h1>{aboutEntry.data.title}</h1>
+  <div class="stack">
+    <Content />
+  </div>
+</Layout>

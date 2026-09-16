@@ -1,0 +1,122 @@
+---
+import { getCollection, render } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import TagList from "../../components/TagList.astro";
+import RetroButton from "../../components/RetroButton.astro";
+import { entrySlug, isPublished } from "../../lib/content";
+import { withBase, formatDate, isoDate } from "../../lib/url";
+
+export async function getStaticPaths() {
+  const downloads = await getCollection("downloads", isPublished);
+  return downloads.map((download) => ({
+    params: { slug: entrySlug(download) },
+    props: { download },
+  }));
+}
+
+const { download } = Astro.props;
+const { Content } = await render(download);
+---
+
+<Layout title={download.data.title} description={download.data.description} image={download.data.screenshot ?? download.data.icon}>
+  <Breadcrumbs items={[{ label: "Downloads", href: "/downloads/" }, { label: download.data.title }]} />
+
+  <h1>{download.data.title}</h1>
+  <p class="text-muted">{download.data.description}</p>
+
+  {
+    download.data.screenshot && (
+      <img
+        src={withBase(download.data.screenshot)}
+        alt={`${download.data.title} screenshot`}
+        style="max-width:320px; border:1px solid var(--border); margin-bottom:1em;"
+      />
+    )
+  }
+
+  {
+    download.data.warning && (
+      <div class="callout callout--warning">
+        <div class="callout__title">&#9888; Note</div>
+        <p class="no-margin">{download.data.warning}</p>
+      </div>
+    )
+  }
+
+  <table class="meta-table">
+    <tbody>
+      <tr>
+        <th>Category</th>
+        <td>{download.data.category}</td>
+      </tr>
+      {download.data.version && (
+        <tr>
+          <th>Version</th>
+          <td>{download.data.version}</td>
+        </tr>
+      )}
+      <tr>
+        <th>Released</th>
+        <td><time datetime={isoDate(download.data.date)}>{formatDate(download.data.date)}</time></td>
+      </tr>
+      {download.data.updated && (
+        <tr>
+          <th>Updated</th>
+          <td><time datetime={isoDate(download.data.updated)}>{formatDate(download.data.updated)}</time></td>
+        </tr>
+      )}
+      {download.data.fileSize && (
+        <tr>
+          <th>File size</th>
+          <td>{download.data.fileSize}</td>
+        </tr>
+      )}
+      {download.data.platforms.length > 0 && (
+        <tr>
+          <th>Platforms</th>
+          <td>{download.data.platforms.join(", ")}</td>
+        </tr>
+      )}
+      {download.data.filename && (
+        <tr>
+          <th>Filename</th>
+          <td class="text-mono">{download.data.filename}</td>
+        </tr>
+      )}
+      {download.data.checksum && (
+        <tr>
+          <th>{download.data.checksumType}</th>
+          <td class="text-mono" style="word-break:break-all;">{download.data.checksum}</td>
+        </tr>
+      )}
+      {download.data.tags.length > 0 && (
+        <tr>
+          <th>Tags</th>
+          <td><TagList tags={download.data.tags} class="no-margin" /></td>
+        </tr>
+      )}
+    </tbody>
+  </table>
+
+  <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:1.4em;">
+    {
+      download.data.downloadUrl ? (
+        <RetroButton href={download.data.downloadUrl} variant="accent" external>
+          &#11015; Download{download.data.version && ` v${download.data.version}`}
+        </RetroButton>
+      ) : (
+        <span class="callout callout--info" style="margin-bottom:0;">
+          No download link set yet - add a <code>downloadUrl</code> to this file's frontmatter.
+        </span>
+      )
+    }
+    {download.data.mirrorUrl && <RetroButton href={download.data.mirrorUrl} external>Mirror</RetroButton>}
+  </div>
+
+  <div class="stack">
+    <Content />
+  </div>
+
+  <p><a href={withBase("/downloads/")}>&laquo; back to the archive</a></p>
+</Layout>

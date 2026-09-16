@@ -1,0 +1,23 @@
+---
+interface Props {
+  href: string;
+  variant?: "default" | "accent";
+  small?: boolean;
+  external?: boolean;
+  class?: string;
+}
+
+const { href, variant = "default", small = false, external = false, class: className } = Astro.props;
+
+const classes = ["btn", variant === "accent" && "btn--accent", small && "btn--small", className].filter(Boolean);
+---
+
+<a
+  href={href}
+  class:list={classes}
+  target={external ? "_blank" : undefined}
+  rel={external ? "noopener noreferrer" : undefined}
+>
+  <slot />
+  {external && <span class="visually-hidden"> (opens in new tab)</span>}
+</a>

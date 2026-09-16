@@ -1,0 +1,38 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../../layouts/Layout.astro";
+import DownloadItem from "../../../components/DownloadItem.astro";
+import Breadcrumbs from "../../../components/Breadcrumbs.astro";
+import { isPublished, byDateDesc } from "../../../lib/content";
+import { slugifyToken } from "../../../lib/url";
+
+export async function getStaticPaths() {
+  const downloads = await getCollection("downloads", isPublished);
+  const map = new Map<string, { label: string; slug: string }>();
+  for (const d of downloads) {
+    const slug = slugifyToken(d.data.category);
+    if (!map.has(slug)) map.set(slug, { label: d.data.category, slug });
+  }
+  return [...map.values()].map(({ label, slug }) => ({
+    params: { category: slug },
+    props: { categoryLabel: label },
+  }));
+}
+
+const { categoryLabel } = Astro.props;
+const allDownloads = await getCollection("downloads", isPublished);
+const downloads = allDownloads
+  .filter((d) => slugifyToken(d.data.category) === Astro.params.category)
+  .sort(byDateDesc);
+---
+
+<Layout title={`Downloads: ${categoryLabel}`} description={`Downloads in the ${categoryLabel} category.`}>
+  <Breadcrumbs items={[{ label: "Downloads", href: "/downloads/" }, { label: categoryLabel }]} />
+  <h1>Downloads &mdash; {categoryLabel}</h1>
+  <div class="row-list">
+    {downloads.map((download) => (
+      <DownloadItem download={download} />
+    ))}
+  </div>
+  <p><a href="../../">&laquo; back to all downloads</a></p>
+</Layout>

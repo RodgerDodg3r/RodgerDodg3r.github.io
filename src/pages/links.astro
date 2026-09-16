@@ -1,0 +1,58 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import Panel from "../components/Panel.astro";
+import Breadcrumbs from "../components/Breadcrumbs.astro";
+
+const allLinks = await getCollection("links");
+
+// Preserve a sensible default category order; anything else appears after,
+// alphabetically.
+const preferredOrder = ["Friends", "Cool Websites", "Software", "Game Development", "Other"];
+
+const categories = [...new Set(allLinks.map((l) => l.data.category))].sort((a, b) => {
+  const ai = preferredOrder.indexOf(a);
+  const bi = preferredOrder.indexOf(b);
+  if (ai !== -1 && bi !== -1) return ai - bi;
+  if (ai !== -1) return -1;
+  if (bi !== -1) return 1;
+  return a.localeCompare(b);
+});
+
+const byCategory = categories.map((category) => ({
+  category,
+  items: allLinks
+    .filter((l) => l.data.category === category)
+    .sort((a, b) => a.data.order - b.data.order || a.data.title.localeCompare(b.data.title)),
+}));
+---
+
+<Layout title="Links" description="A page of links to friends, cool websites, software and other corners of the internet.">
+  <Breadcrumbs items={[{ label: "Links" }]} />
+  <h1>Links</h1>
+  <p class="text-muted">
+    An old-fashioned links page. A few of the sites, tools and people worth pointing at. Add your own in
+    <code>src/content/links/</code>.
+  </p>
+
+  {
+    allLinks.length === 0 && <p class="text-muted">No links yet.</p>
+  }
+
+  {
+    byCategory.map(({ category, items }) => (
+      <Panel title={category}>
+        <ul role="list" class="stack">
+          {items.map((link) => (
+            <li>
+              <a href={link.data.url} target="_blank" rel="noopener noreferrer">
+                {link.data.title}
+              </a>
+              {link.data.description && <span class="text-muted"> &mdash; {link.data.description}</span>}
+            </li>
+          ))}
+        </ul>
+      </Panel>
+    ))
+  }
+</Layout>

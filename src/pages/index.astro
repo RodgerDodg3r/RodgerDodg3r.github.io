@@ -1,0 +1,145 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import Panel from "../components/Panel.astro";
+import PostPreview from "../components/PostPreview.astro";
+import GameCard from "../components/GameCard.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import DownloadItem from "../components/DownloadItem.astro";
+import { withBase, formatDate } from "../lib/url";
+import { isPublished, byDateDesc, entrySlug } from "../lib/content";
+import { siteConfig } from "../config";
+
+const [posts, games, projects, downloads] = await Promise.all([
+  getCollection("posts", isPublished),
+  getCollection("games", isPublished),
+  getCollection("projects", isPublished),
+  getCollection("downloads", isPublished),
+]);
+
+const latestPosts = posts.sort(byDateDesc).slice(0, siteConfig.home.recentPostsCount);
+
+const featuredGame = games.filter((g) => g.data.featured).sort(byDateDesc)[0] ?? games.sort(byDateDesc)[0];
+const featuredProject =
+  projects.filter((p) => p.data.featured).sort(byDateDesc)[0] ?? projects.sort(byDateDesc)[0];
+
+const latestDownloads = downloads.sort(byDateDesc).slice(0, siteConfig.home.recentDownloadsCount);
+
+// "Recently updated" - anything across all collections with an `updated`
+// field newer than its `date`, newest first.
+type RecentItem = { title: string; href: string; when: Date; kind: string };
+const recentlyUpdated: RecentItem[] = [...games, ...projects, ...downloads]
+  .filter((entry) => entry.data.updated)
+  .map((entry) => {
+    const kind = "platforms" in entry.data ? "games" : "technologies" in entry.data ? "projects" : "downloads";
+    return {
+      title: entry.data.title,
+      href: withBase(`/${kind}/${entrySlug(entry)}/`),
+      when: entry.data.updated as Date,
+      kind,
+    };
+  })
+  .sort((a, b) => b.when.valueOf() - a.when.valueOf())
+  .slice(0, 5);
+
+const totalGames = games.length;
+const totalProjects = projects.length;
+const totalDownloads = downloads.length;
+---
+
+<Layout title={siteConfig.name} description={siteConfig.description}>
+  <div class="welcome-box">
+    <h1>Welcome to my little corner of the internet.</h1>
+    <p>
+      Hi, I'm {siteConfig.author}. This site is my personal home base for devlogs, games, software
+      experiments and the odd download - built the old-fashioned way, one Markdown file at a time.
+    </p>
+    <p>Have a look around using the navigation on the left, or dive into the latest updates below.</p>
+    <div class="welcome-box__meta">
+      {totalGames} game{totalGames === 1 ? "" : "s"} logged &middot;
+      {totalProjects} project{totalProjects === 1 ? "" : "s"} logged &middot;
+      {totalDownloads} file{totalDownloads === 1 ? "" : "s"} in the archive
+    </div>
+  </div>
+
+  <div class="home-grid">
+    <div>
+      <Panel title="Latest news">
+        <Fragment slot="header-extra">
+          <a href={withBase("/posts/")} style="font-size:0.75rem;">all posts &raquo;</a>
+        </Fragment>
+        {
+          latestPosts.length > 0 ? (
+            latestPosts.map((post) => <PostPreview post={post} compact />)
+          ) : (
+            <p class="text-muted">No posts yet - add one in src/content/posts/.</p>
+          )
+        }
+      </Panel>
+
+      {
+        featuredGame && (
+          <Panel title="Featured game">
+            <GameCard game={featuredGame} />
+            <div class="panel-link-row">
+              <a href={withBase("/games/")}>browse all games &raquo;</a>
+            </div>
+          </Panel>
+        )
+      }
+    </div>
+
+    <div>
+      {
+        featuredProject && (
+          <Panel title="Featured project">
+            <ProjectCard project={featuredProject} />
+            <div class="panel-link-row">
+              <a href={withBase("/projects/")}>browse all projects &raquo;</a>
+            </div>
+          </Panel>
+        )
+      }
+
+      {
+        latestDownloads.length > 0 && (
+          <Panel title="Newest downloads">
+            <div class="row-list" style="border:none;">
+              {latestDownloads.map((d) => (
+                <DownloadItem download={d} />
+              ))}
+            </div>
+            <div class="panel-link-row">
+              <a href={withBase("/downloads/")}>visit the archive &raquo;</a>
+            </div>
+          </Panel>
+        )
+      }
+    </div>
+  </div>
+
+  {
+    recentlyUpdated.length > 0 && (
+      <Panel title="Recently updated">
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Section</th>
+              <th>Updated</th>
+            </tr>
+          </thead>
+          <tbody>
+            {recentlyUpdated.map((item) => (
+              <tr>
+                <td><a href={item.href}>{item.title}</a></td>
+                <td class="text-mono text-muted">{item.kind}</td>
+                <td>{formatDate(item.when)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Panel>
+    )
+  }
+</Layout>
