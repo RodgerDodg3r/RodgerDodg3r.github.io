@@ -1,0 +1,30 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import { isPublished, byDateDesc } from "../../lib/content";
+
+const projects = (await getCollection("projects", isPublished)).sort(byDateDesc);
+---
+
+<Layout title="Projects" description="Software, tools, experiments and other projects by Bart.">
+  <Breadcrumbs items={[{ label: "Projects" }]} />
+  <h1>Projects</h1>
+  <p class="text-muted">
+    Software, tools, websites, experiments and the occasional abandoned idea. Not everything here is finished -
+    that's kind of the point of a devlog.
+  </p>
+
+  {
+    projects.length > 0 ? (
+      <div class="card-grid">
+        {projects.map((project) => (
+          <ProjectCard project={project} />
+        ))}
+      </div>
+    ) : (
+      <p class="text-muted">No projects yet - add one in src/content/projects/.</p>
+    )
+  }
+</Layout>
