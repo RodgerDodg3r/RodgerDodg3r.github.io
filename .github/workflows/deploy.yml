@@ -1,0 +1,85 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # Allows manually running this workflow from the Actions tab on GitHub.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only allow one deployment at a time; skip any runs queued between an
+# in-progress run and the latest one.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # ---------------------------------------------------------------
+      # Work out the correct "site" and "base" for Astro automatically.
+      #
+      #   - A repo named "<owner>.github.io" is a GitHub *user/org* site,
+      #     served at the domain root: https://<owner>.github.io/
+      #     -> base = "/"
+      #
+      #   - Any other repo is a *project* site, served from a sub-path:
+      #     https://<owner>.github.io/<repo>/
+      #     -> base = "/<repo>"
+      #
+      # These are exported as ASTRO_SITE / ASTRO_BASE, which
+      # astro.config.mjs reads at build time. You never need to hardcode
+      # your username or repo name anywhere for this to work.
+      # ---------------------------------------------------------------
+      - name: Compute Astro site & base
+        id: astro-paths
+        run: |
+          OWNER="${GITHUB_REPOSITORY_OWNER}"
+          REPO_NAME="${GITHUB_REPOSITORY#*/}"
+          SITE="https://${OWNER}.github.io"
+
+          if [ "${REPO_NAME}" = "${OWNER}.github.io" ]; then
+            BASE="/"
+          else
+            BASE="/${REPO_NAME}"
+          fi
+
+          echo "ASTRO_SITE=${SITE}" >> "$GITHUB_ENV"
+          echo "ASTRO_BASE=${BASE}" >> "$GITHUB_ENV"
+          echo "Resolved site=${SITE} base=${BASE}"
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

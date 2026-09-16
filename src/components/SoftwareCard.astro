@@ -1,0 +1,38 @@
+---
+import type { SoftwareEntry } from "../lib/content";
+import { entrySlug } from "../lib/content";
+import { withBase, formatDate } from "../lib/url";
+import StatusBadge from "./StatusBadge.astro";
+
+interface Props {
+  software: SoftwareEntry;
+}
+
+const { software } = Astro.props;
+const href = withBase(`/software/${entrySlug(software)}/`);
+---
+
+<article class="card">
+  <a href={href} class="card__thumb" tabindex="-1" aria-hidden="true">
+    {
+      software.data.thumbnail ? (
+        <img src={withBase(software.data.thumbnail)} alt="" loading="lazy" />
+      ) : (
+        <span class="card__thumb-placeholder">no image<br />available</span>
+      )
+    }
+  </a>
+  <div class="card__body">
+    <h3 class="card__title">
+      <a href={href}>{software.data.title}</a>
+    </h3>
+    <p class="card__summary">{software.data.summary}</p>
+    <div class="meta-line">{formatDate(software.data.date)}</div>
+    <div class="card__footer">
+      <StatusBadge status={software.data.status} />
+      {software.data.technologies.length > 0 && (
+        <span class="marquee-note">{software.data.technologies.slice(0, 3).join(", ")}</span>
+      )}
+    </div>
+  </div>
+</article>

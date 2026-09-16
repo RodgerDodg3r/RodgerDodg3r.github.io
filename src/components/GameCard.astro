@@ -1,0 +1,36 @@
+---
+import type { GameEntry } from "../lib/content";
+import { entrySlug } from "../lib/content";
+import { withBase, formatDate } from "../lib/url";
+import StatusBadge from "./StatusBadge.astro";
+
+interface Props {
+  game: GameEntry;
+}
+
+const { game } = Astro.props;
+const href = withBase(`/games/${entrySlug(game)}/`);
+---
+
+<article class="card">
+  <a href={href} class="card__thumb" tabindex="-1" aria-hidden="true">
+    {
+      game.data.thumbnail ? (
+        <img src={withBase(game.data.thumbnail)} alt="" loading="lazy" />
+      ) : (
+        <span class="card__thumb-placeholder">no image<br />available</span>
+      )
+    }
+  </a>
+  <div class="card__body">
+    <h3 class="card__title">
+      <a href={href}>{game.data.title}</a>
+    </h3>
+    <p class="card__summary">{game.data.summary}</p>
+    <div class="meta-line">{formatDate(game.data.date)}{game.data.version && ` · v${game.data.version}`}</div>
+    <div class="card__footer">
+      <StatusBadge status={game.data.status} />
+      {game.data.platforms.length > 0 && <span class="marquee-note">{game.data.platforms.join(" / ")}</span>}
+    </div>
+  </div>
+</article>

@@ -1,0 +1,91 @@
+---
+import { getCollection, render } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import StatusBadge from "../../components/StatusBadge.astro";
+import TagList from "../../components/TagList.astro";
+import RetroButton from "../../components/RetroButton.astro";
+import { entrySlug, isPublished } from "../../lib/content";
+import { withBase, formatDate, isoDate } from "../../lib/url";
+
+export async function getStaticPaths() {
+  const games = await getCollection("games", isPublished);
+  return games.map((game) => ({
+    params: { slug: entrySlug(game) },
+    props: { game },
+  }));
+}
+
+const { game } = Astro.props;
+const { Content } = await render(game);
+---
+
+<Layout title={game.data.title} description={game.data.summary} image={game.data.thumbnail}>
+  <Breadcrumbs items={[{ label: "Games", href: "/games/" }, { label: game.data.title }]} />
+
+  <h1>{game.data.title}</h1>
+  <p class="meta-line">
+    <time datetime={isoDate(game.data.date)}>released {formatDate(game.data.date)}</time>
+    {game.data.updated && <> &middot; updated <time datetime={isoDate(game.data.updated)}>{formatDate(game.data.updated)}</time></>}
+    {game.data.version && <> &middot; v{game.data.version}</>}
+  </p>
+
+  <p>
+    <StatusBadge status={game.data.status} />
+  </p>
+
+  {
+    game.data.thumbnail && (
+      <img src={withBase(game.data.thumbnail)} alt={`${game.data.title} thumbnail`} style="max-width:320px; border:1px solid var(--border); margin-bottom:1em;" />
+    )
+  }
+
+  <table class="meta-table">
+    <tbody>
+      {game.data.platforms.length > 0 && (
+        <tr>
+          <th>Platforms</th>
+          <td>{game.data.platforms.join(", ")}</td>
+        </tr>
+      )}
+      {game.data.tags.length > 0 && (
+        <tr>
+          <th>Tags</th>
+          <td><TagList tags={game.data.tags} linkTo="/games/" class="no-margin" /></td>
+        </tr>
+      )}
+      {(game.data.downloadUrl || game.data.githubUrl || game.data.websiteUrl) && (
+        <tr>
+          <th>Links</th>
+          <td>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              {game.data.downloadUrl && (
+                <RetroButton href={game.data.downloadUrl} variant="accent" external>
+                  Download
+                </RetroButton>
+              )}
+              {game.data.githubUrl && <RetroButton href={game.data.githubUrl} external>Source (GitHub)</RetroButton>}
+              {game.data.websiteUrl && <RetroButton href={game.data.websiteUrl} external>Website</RetroButton>}
+            </div>
+          </td>
+        </tr>
+      )}
+    </tbody>
+  </table>
+
+  {
+    game.data.screenshots.length > 0 && (
+      <div class="screenshot-strip">
+        {game.data.screenshots.map((src) => (
+          <img src={withBase(src)} alt={`${game.data.title} screenshot`} loading="lazy" />
+        ))}
+      </div>
+    )
+  }
+
+  <div class="stack">
+    <Content />
+  </div>
+
+  <p><a href={withBase("/games/")}>&laquo; back to all games</a></p>
+</Layout>

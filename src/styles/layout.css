@@ -1,0 +1,303 @@
+/* ===========================================================================
+   LAYOUT-SPECIFIC STYLES
+   Header / navigation / sidebar / footer - "Windows XP task pane" theme
+   =========================================================================== */
+
+/* -------------------------------------------------------------------- */
+/* Header                                                                */
+/* -------------------------------------------------------------------- */
+
+.site-header {
+  position: relative;
+  min-height: 90px;
+  padding: 18px 20px 22px;
+  color: #fff;
+  border-bottom: 1px solid var(--xp-blue-border);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0, rgba(255, 255, 255, 0.08) 13%, transparent 14%),
+    linear-gradient(180deg, var(--xp-blue-1), var(--xp-blue-2) 56%, var(--xp-blue-3));
+}
+
+.site-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(0, 0, 0, 0.06);
+  pointer-events: none;
+}
+
+.site-header__logo {
+  position: relative;
+  z-index: 1;
+  display: block;
+  text-decoration: none;
+  color: #fff;
+}
+
+.site-header__title {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 1.9rem;
+  font-weight: bold;
+  letter-spacing: -0.5px;
+  line-height: 1.15;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.22);
+}
+
+.site-header__tagline {
+  display: block;
+  margin-top: 5px;
+  color: #eef6ff;
+  font-size: 0.78rem;
+}
+
+/* -------------------------------------------------------------------- */
+/* Sidebar (task pane)                                                   */
+/* -------------------------------------------------------------------- */
+
+.sidebar {
+  padding: 10px;
+  border-right: 1px solid #9ab1cf;
+  background: linear-gradient(180deg, var(--task-bg-1), var(--task-bg-2));
+}
+
+.sidebar-task-group {
+  border: 1px solid var(--task-border);
+  background: #edf5ff;
+}
+
+.sidebar-task-title {
+  padding: 5px 7px;
+  color: #fff;
+  font-weight: bold;
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  border-bottom: 1px solid #2b5fa8;
+  background: linear-gradient(180deg, var(--panel-title-1), var(--panel-title-2));
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
+}
+
+.sidebar-task-body {
+  padding: 7px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.18)), #e4f0fe;
+}
+
+.sidebar-nav {
+  display: grid;
+  gap: 5px;
+}
+
+.sidebar-nav__link {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 30px;
+  padding: 5px 7px;
+  color: #244d83;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 0.85rem;
+  border: 1px solid var(--tile-border);
+  background: linear-gradient(180deg, #ffffff, var(--tile));
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.95), inset -1px -1px 0 rgba(122, 151, 190, 0.12);
+}
+
+.sidebar-nav__link:hover,
+.sidebar-nav__link:focus-visible {
+  background: linear-gradient(180deg, #ffffff, var(--tile-hover));
+  border-color: #7f9fc7;
+  color: #173f78;
+}
+
+.sidebar-nav__link[aria-current="page"] {
+  border-color: var(--xp-blue-2);
+  background: linear-gradient(180deg, #eaf2ff, var(--tile-hover));
+  color: #173f78;
+}
+
+.sidebar-nav__icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  display: block;
+}
+
+@media (max-width: 760px) {
+  .sidebar {
+    border-right: none;
+    border-bottom: 1px solid #9ab1cf;
+    padding: 8px;
+  }
+
+  .sidebar-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 460px) {
+  .sidebar-nav {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* -------------------------------------------------------------------- */
+/* Footer                                                                */
+/* -------------------------------------------------------------------- */
+
+.site-footer {
+  border-top: 1px solid #99afcb;
+  background: linear-gradient(180deg, #e7eef7, #d4e0ee);
+  padding: 10px 12px;
+  font-size: 0.78rem;
+  color: #5d6a7b;
+}
+
+.site-footer__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.site-footer__col {
+  min-width: 160px;
+}
+
+.site-footer__heading {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  color: #5d6a7b;
+  margin-bottom: 4px;
+}
+
+.site-footer ul {
+  padding: 0;
+  margin: 0;
+}
+
+.site-footer li {
+  margin-bottom: 2px;
+}
+
+.site-footer a {
+  color: #436590;
+}
+
+.badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.badge-88x31 {
+  width: 88px;
+  height: 31px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  line-height: 1.15;
+  color: var(--muted-text);
+  background: var(--badge-bg);
+  text-decoration: none;
+  padding: 2px;
+  overflow: hidden;
+}
+
+.badge-88x31:hover,
+.badge-88x31:focus-visible {
+  border-color: var(--accent-strong);
+  color: var(--accent-strong);
+}
+
+.badge-88x31 img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.site-footer__legal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  border-top: 1px solid #99afcb;
+  padding-top: 9px;
+  font-size: 0.75rem;
+}
+
+.site-footer__legal-text {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.site-footer__legal-text span {
+  white-space: nowrap;
+}
+
+.visitor-counter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.visitor-counter__value {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 70px;
+  padding: 3px 6px;
+  border: 1px inset #687a8e;
+  background: var(--counter-bg);
+  color: var(--counter-text);
+  font: bold 10px "Courier New", monospace;
+  letter-spacing: 2px;
+}
+
+@media (max-width: 560px) {
+  .site-footer__legal {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* -------------------------------------------------------------------- */
+/* Homepage grid                                                        */
+/* -------------------------------------------------------------------- */
+
+.home-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--panel-gap);
+  align-items: start;
+  margin-top: var(--panel-gap);
+}
+
+@media (max-width: 620px) {
+  .home-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel-link-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+  margin-top: 8px;
+}

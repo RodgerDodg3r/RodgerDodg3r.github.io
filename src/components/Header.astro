@@ -1,0 +1,11 @@
+---
+import { siteConfig } from "../config";
+import { withBase } from "../lib/url";
+---
+
+<header class="site-header">
+  <a class="site-header__logo" href={withBase("/")}>
+    <span class="site-header__title">{siteConfig.name}</span>
+    <span class="site-header__tagline">{siteConfig.tagline}</span>
+  </a>
+</header>

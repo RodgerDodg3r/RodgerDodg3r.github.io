@@ -1,0 +1,123 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import Panel from "../components/Panel.astro";
+import GameCard from "../components/GameCard.astro";
+import SoftwareCard from "../components/SoftwareCard.astro";
+import DownloadTable from "../components/DownloadTable.astro";
+import { withBase, formatDate } from "../lib/url";
+import { isPublished, byDateDesc, entrySlug } from "../lib/content";
+import { siteConfig } from "../config";
+
+const [games, software, downloads] = await Promise.all([
+  getCollection("games", isPublished),
+  getCollection("software", isPublished),
+  getCollection("downloads", isPublished),
+]);
+
+const featuredGame = games.filter((g) => g.data.featured).sort(byDateDesc)[0] ?? games.sort(byDateDesc)[0];
+const featuredSoftware =
+  software.filter((s) => s.data.featured).sort(byDateDesc)[0] ?? software.sort(byDateDesc)[0];
+
+const latestDownloads = downloads.sort(byDateDesc).slice(0, siteConfig.home.recentDownloadsCount);
+
+// "Recently updated" - anything across all collections with an `updated`
+// field newer than its `date`, newest first.
+type RecentItem = { title: string; href: string; when: Date; kind: string };
+const recentlyUpdated: RecentItem[] = [...games, ...software, ...downloads]
+  .filter((entry) => entry.data.updated)
+  .map((entry) => {
+    const kind = "platforms" in entry.data ? "games" : "technologies" in entry.data ? "software" : "downloads";
+    return {
+      title: entry.data.title,
+      href: withBase(`/${kind}/${entrySlug(entry)}/`),
+      when: entry.data.updated as Date,
+      kind,
+    };
+  })
+  .sort((a, b) => b.when.valueOf() - a.when.valueOf())
+  .slice(0, 5);
+
+const totalGames = games.length;
+const totalSoftware = software.length;
+const totalDownloads = downloads.length;
+---
+
+<Layout title={siteConfig.name} description={siteConfig.description}>
+  <section class="panel" id="home">
+    <div class="panel-title">Welcome</div>
+    <div class="welcome">
+      <h1>Welcome to my website</h1>
+      <p>
+        Hi, I'm {siteConfig.author}. This is my personal corner of the internet - games, software and the
+        odd download, kept up to date one Markdown file at a time.
+      </p>
+      <p>Use the navigation on the left to look around.</p>
+      <p class="note">
+        {totalGames} game{totalGames === 1 ? "" : "s"} &middot;
+        {totalSoftware} software item{totalSoftware === 1 ? "" : "s"} &middot;
+        {totalDownloads} file{totalDownloads === 1 ? "" : "s"} in the archive
+      </p>
+    </div>
+  </section>
+
+  <div class="home-grid">
+    {
+      featuredGame && (
+        <Panel title="Featured game">
+          <GameCard game={featuredGame} />
+          <div class="panel-link-row">
+            <a href={withBase("/games/")}>browse all games &raquo;</a>
+          </div>
+        </Panel>
+      )
+    }
+
+    {
+      featuredSoftware && (
+        <Panel title="Featured software">
+          <SoftwareCard software={featuredSoftware} />
+          <div class="panel-link-row">
+            <a href={withBase("/software/")}>browse all software &raquo;</a>
+          </div>
+        </Panel>
+      )
+    }
+  </div>
+
+  {
+    latestDownloads.length > 0 && (
+      <Panel title="Newest downloads">
+        <DownloadTable downloads={latestDownloads} />
+        <div class="panel-link-row">
+          <a href={withBase("/downloads/")}>visit the archive &raquo;</a>
+        </div>
+      </Panel>
+    )
+  }
+
+  {
+    recentlyUpdated.length > 0 && (
+      <Panel title="Recently updated">
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Section</th>
+              <th>Updated</th>
+            </tr>
+          </thead>
+          <tbody>
+            {recentlyUpdated.map((item) => (
+              <tr>
+                <td><a href={item.href}>{item.title}</a></td>
+                <td class="text-mono text-muted">{item.kind}</td>
+                <td>{formatDate(item.when)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Panel>
+    )
+  }
+</Layout>

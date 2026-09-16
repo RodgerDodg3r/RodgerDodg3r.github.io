@@ -1,0 +1,77 @@
+---
+import { siteConfig } from "../config";
+import { withBase } from "../lib/url";
+import { badges } from "../lib/badges";
+
+const currentYear = new Date().getFullYear();
+const { startYear, copyrightName, bestViewedWith, siteVersion, visitorCount } = siteConfig.footer;
+const yearRange = startYear >= currentYear ? `${currentYear}` : `${startYear}-${currentYear}`;
+const lastUpdated = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+
+const hasSocialLinks =
+  siteConfig.links.github ||
+  siteConfig.links.youtube ||
+  siteConfig.links.discord ||
+  siteConfig.links.twitter ||
+  siteConfig.links.mastodon ||
+  siteConfig.links.email;
+---
+
+<footer class="site-footer">
+  <div class="site-footer__row">
+    <div class="site-footer__col">
+      <div class="site-footer__heading">Site</div>
+      <ul role="list">
+        {siteConfig.nav.map((item) => <li><a href={withBase(item.href)}>{item.label}</a></li>)}
+      </ul>
+    </div>
+
+    {
+      hasSocialLinks && (
+        <div class="site-footer__col">
+          <div class="site-footer__heading">Elsewhere</div>
+          <ul role="list">
+            {siteConfig.links.github && <li><a href={siteConfig.links.github} target="_blank" rel="noopener noreferrer">GitHub</a></li>}
+            {siteConfig.links.youtube && <li><a href={siteConfig.links.youtube} target="_blank" rel="noopener noreferrer">YouTube</a></li>}
+            {siteConfig.links.discord && <li><a href={siteConfig.links.discord} target="_blank" rel="noopener noreferrer">Discord</a></li>}
+            {siteConfig.links.twitter && <li><a href={siteConfig.links.twitter} target="_blank" rel="noopener noreferrer">Twitter / X</a></li>}
+            {siteConfig.links.mastodon && <li><a href={siteConfig.links.mastodon} target="_blank" rel="noopener noreferrer">Mastodon</a></li>}
+            {siteConfig.links.email && <li><a href={`mailto:${siteConfig.links.email}`}>Email</a></li>}
+          </ul>
+        </div>
+      )
+    }
+
+    <div class="site-footer__col">
+      <div class="site-footer__heading">Web buttons</div>
+      <div class="badge-row">
+        {
+          badges.map((badge) => (
+            <a
+              class="badge-88x31"
+              href={badge.href}
+              target={badge.external ? "_blank" : undefined}
+              rel={badge.external ? "noopener noreferrer" : undefined}
+              title={badge.label}
+            >
+              {badge.image ? <img src={withBase(badge.image)} alt={badge.label} loading="lazy" /> : badge.label}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="site-footer__legal">
+    <div class="site-footer__legal-text">
+      <span>&copy; {yearRange} {copyrightName}</span>
+      <span>{bestViewedWith}</span>
+      <span>site {siteVersion} &middot; built with Astro &middot; hosted on GitHub Pages</span>
+      <span>last updated {lastUpdated}</span>
+    </div>
+    <div class="visitor-counter">
+      Visitors:
+      <span class="visitor-counter__value">{visitorCount}</span>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,55 @@
+---
+import type { DownloadEntry } from "../lib/content";
+import { entrySlug } from "../lib/content";
+import { withBase, formatDate } from "../lib/url";
+import TagList from "./TagList.astro";
+
+interface Props {
+  downloads: DownloadEntry[];
+  /** Show the Category column (hide it when already viewing one category). */
+  showCategory?: boolean;
+}
+
+const { downloads, showCategory = false } = Astro.props;
+---
+
+<div class="table-scroll">
+<table class="download-table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      {showCategory && <th>Category</th>}
+      <th>Version</th>
+      <th>Platforms</th>
+      <th>Tags</th>
+      <th>Size</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    {
+      downloads.map((download) => (
+        <tr>
+          <td>
+            <a class="download-table__name" href={withBase(`/downloads/${entrySlug(download)}/`)}>
+              {download.data.title}
+            </a>
+          </td>
+          {showCategory && <td>{download.data.category}</td>}
+          <td class="text-mono">{download.data.version ?? "—"}</td>
+          <td>{download.data.platforms.length > 0 ? download.data.platforms.join(", ") : "—"}</td>
+          <td>
+            {download.data.tags.length > 0 ? (
+              <TagList tags={download.data.tags} class="no-margin" />
+            ) : (
+              "—"
+            )}
+          </td>
+          <td>{download.data.fileSize ?? "—"}</td>
+          <td>{formatDate(download.data.date)}</td>
+        </tr>
+      ))
+    }
+  </tbody>
+</table>
+</div>

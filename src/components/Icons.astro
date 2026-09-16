@@ -1,0 +1,47 @@
+{/*
+  Small inline SVGs styled after classic Windows XP-era 16x16 icons.
+  Rendered once (in Layout.astro) and referenced elsewhere via
+  <svg class="sidebar-nav__icon"><use href="#icon-home"></use></svg>
+*/}
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="xpBlueIcon" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#82b7ff" />
+      <stop offset="1" stop-color="#2f6ed3" />
+    </linearGradient>
+  </defs>
+
+  <symbol id="icon-home" viewBox="0 0 16 16">
+    <path d="M1.5 7.2 8 1.8l6.5 5.4v7.1H9.8V9.7H6.2v4.6H1.5z" fill="#f1d05e" stroke="#9b6f18" stroke-width=".7" />
+    <path d="M.9 7.1 8 1.1l7.1 6" fill="none" stroke="#c24c3d" stroke-width="1.4" />
+    <rect x="10.6" y="3.2" width="1.9" height="2.8" fill="#dcecff" stroke="#4873aa" stroke-width=".5" />
+  </symbol>
+
+  <symbol id="icon-person" viewBox="0 0 16 16">
+    <circle cx="8" cy="4.2" r="2.5" fill="#ffd5ac" stroke="#b97852" stroke-width=".6" />
+    <path d="M3 14.2c.2-3.3 1.9-5.4 5-5.4s4.8 2.1 5 5.4z" fill="url(#xpBlueIcon)" stroke="#295ba8" stroke-width=".7" />
+    <path d="M5.7 9.5 8 11.2l2.3-1.7" fill="none" stroke="#fff" stroke-width=".7" />
+  </symbol>
+
+  <symbol id="icon-disc" viewBox="0 0 16 16">
+    <circle cx="8" cy="8" r="6.6" fill="url(#xpBlueIcon)" stroke="#214e91" stroke-width=".8" />
+    <circle cx="8" cy="8" r="2.6" fill="#eef6ff" stroke="#214e91" stroke-width=".6" />
+    <circle cx="8" cy="8" r="1" fill="#214e91" />
+    <path d="M2 5.6c1.3-.5 2.5-.3 3.1.8" fill="none" stroke="#fff" stroke-width=".6" opacity=".7" />
+  </symbol>
+
+  <symbol id="icon-joystick" viewBox="0 0 16 16">
+    <rect x="1.5" y="8" width="13" height="6.2" rx="2.4" fill="#9dd074" stroke="#4d7b31" stroke-width=".8" />
+    <circle cx="5" cy="11" r="1.5" fill="#3a5f22" />
+    <circle cx="11.3" cy="10" r="1" fill="#c24c3d" stroke="#7a2c1e" stroke-width=".4" />
+    <circle cx="11.3" cy="12.3" r="1" fill="#e4a62a" stroke="#8a640f" stroke-width=".4" />
+    <rect x="6.6" y="2" width="1.6" height="6.4" rx=".6" fill="#c9d5df" stroke="#5c6b78" stroke-width=".5" />
+    <circle cx="7.4" cy="2" r="1.5" fill="#e6ecf1" stroke="#5c6b78" stroke-width=".5" />
+  </symbol>
+
+  <symbol id="icon-download" viewBox="0 0 16 16">
+    <path d="M4 6.5 8 10.5 12 6.5" fill="none" stroke="#295ba8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M8 1.5v9" fill="none" stroke="#295ba8" stroke-width="1.5" stroke-linecap="round" />
+    <rect x="2" y="12.3" width="12" height="2.2" rx=".5" fill="url(#xpBlueIcon)" stroke="#214e91" stroke-width=".6" />
+  </symbol>
+</svg>

@@ -1,0 +1,35 @@
+---
+import { siteConfig } from "../config";
+import { withBase } from "../lib/url";
+
+const currentPath = Astro.url.pathname.replace(import.meta.env.BASE_URL, "/").replace(/^\/?/, "/");
+
+function isActive(href: string): boolean {
+  if (href === "/") return currentPath === "/" || currentPath === "";
+  return currentPath.startsWith(href);
+}
+---
+
+<nav class="sidebar" aria-label="Main navigation">
+  <div class="sidebar-task-group">
+    <div class="sidebar-task-title">Navigation</div>
+    <div class="sidebar-task-body">
+      <div class="sidebar-nav">
+        {
+          siteConfig.nav.map((item) => (
+            <a
+              class="sidebar-nav__link"
+              href={withBase(item.href)}
+              aria-current={isActive(item.href) ? "page" : undefined}
+            >
+              <svg class="sidebar-nav__icon" aria-hidden="true">
+                <use href={`#${item.icon}`} />
+              </svg>
+              {item.label}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</nav>

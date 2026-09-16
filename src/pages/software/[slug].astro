@@ -1,0 +1,90 @@
+---
+import { getCollection, render } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import StatusBadge from "../../components/StatusBadge.astro";
+import TagList from "../../components/TagList.astro";
+import RetroButton from "../../components/RetroButton.astro";
+import { entrySlug, isPublished } from "../../lib/content";
+import { withBase, formatDate, isoDate } from "../../lib/url";
+
+export async function getStaticPaths() {
+  const software = await getCollection("software", isPublished);
+  return software.map((item) => ({
+    params: { slug: entrySlug(item) },
+    props: { item },
+  }));
+}
+
+const { item } = Astro.props;
+const { Content } = await render(item);
+---
+
+<Layout title={item.data.title} description={item.data.summary} image={item.data.thumbnail}>
+  <Breadcrumbs items={[{ label: "Software", href: "/software/" }, { label: item.data.title }]} />
+
+  <h1>{item.data.title}</h1>
+  <p class="meta-line">
+    <time datetime={isoDate(item.data.date)}>{formatDate(item.data.date)}</time>
+    {item.data.updated && <> &middot; updated <time datetime={isoDate(item.data.updated)}>{formatDate(item.data.updated)}</time></>}
+  </p>
+
+  <p>
+    <StatusBadge status={item.data.status} />
+  </p>
+
+  {
+    item.data.thumbnail && (
+      <img src={withBase(item.data.thumbnail)} alt={`${item.data.title} thumbnail`} style="max-width:320px; border:1px solid var(--border); margin-bottom:1em;" />
+    )
+  }
+
+  <table class="meta-table">
+    <tbody>
+      {item.data.technologies.length > 0 && (
+        <tr>
+          <th>Technologies</th>
+          <td>{item.data.technologies.join(", ")}</td>
+        </tr>
+      )}
+      {item.data.tags.length > 0 && (
+        <tr>
+          <th>Tags</th>
+          <td><TagList tags={item.data.tags} class="no-margin" /></td>
+        </tr>
+      )}
+      {(item.data.downloadUrl || item.data.githubUrl || item.data.websiteUrl) && (
+        <tr>
+          <th>Links</th>
+          <td>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              {item.data.downloadUrl && (
+                <RetroButton href={item.data.downloadUrl} variant="accent" external>
+                  Download
+                </RetroButton>
+              )}
+              {item.data.githubUrl && <RetroButton href={item.data.githubUrl} external>Source (GitHub)</RetroButton>}
+              {item.data.websiteUrl && <RetroButton href={item.data.websiteUrl} external>Website</RetroButton>}
+            </div>
+          </td>
+        </tr>
+      )}
+    </tbody>
+  </table>
+
+  {
+    item.data.screenshots.length > 0 && (
+      <div class="screenshot-strip">
+        {item.data.screenshots.map((src) => (
+          <img src={withBase(src)} alt={`${item.data.title} screenshot`} loading="lazy" />
+        ))}
+      </div>
+    )
+  }
+
+  <div class="stack">
+    <Content />
+  </div>
+
+  <p><a href={withBase("/software/")}>&laquo; back to all software</a></p>
+</Layout>

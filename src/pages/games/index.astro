@@ -1,0 +1,61 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import Panel from "../../components/Panel.astro";
+import GameCard from "../../components/GameCard.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import { withBase, slugifyToken } from "../../lib/url";
+import { isPublished, byDateDesc } from "../../lib/content";
+
+const games = (await getCollection("games", isPublished)).sort(byDateDesc);
+
+const allTags = [...new Set(games.flatMap((g) => g.data.tags))].sort();
+const allStatuses = [...new Set(games.map((g) => g.data.status))].sort();
+---
+
+<Layout title="Games" description="Games built by Bart / Wizard Cat Studio.">
+  <Breadcrumbs items={[{ label: "Games" }]} />
+  <h1>Games</h1>
+  <p class="text-muted">Everything I've shipped, prototyped, or am still chipping away at.</p>
+
+  {
+    (allTags.length > 0 || allStatuses.length > 0) && (
+      <Panel title="Browse by">
+        {allStatuses.length > 0 && (
+          <p class="no-margin">
+            <span class="text-mono text-muted" style="font-size:0.75rem;">status:</span>{" "}
+            {allStatuses.map((status, i) => (
+              <>
+                {i > 0 && " · "}
+                <a href={withBase(`/games/status/${slugifyToken(status)}/`)}>{status}</a>
+              </>
+            ))}
+          </p>
+        )}
+        {allTags.length > 0 && (
+          <p class="no-margin" style="margin-top:6px;">
+            <span class="text-mono text-muted" style="font-size:0.75rem;">tags:</span>{" "}
+            {allTags.map((tag, i) => (
+              <>
+                {i > 0 && " · "}
+                <a href={withBase(`/games/tag/${slugifyToken(tag)}/`)}>{tag}</a>
+              </>
+            ))}
+          </p>
+        )}
+      </Panel>
+    )
+  }
+
+  {
+    games.length > 0 ? (
+      <div class="card-grid">
+        {games.map((game) => (
+          <GameCard game={game} />
+        ))}
+      </div>
+    ) : (
+      <p class="text-muted">No games yet - add one in src/content/games/.</p>
+    )
+  }
+</Layout>
